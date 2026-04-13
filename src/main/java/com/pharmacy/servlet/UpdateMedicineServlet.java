@@ -1,44 +1,27 @@
 package com.pharmacy.servlet;
 
-import com.pharmacy.dao.DBConnection;
-
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-
-import javax.servlet.ServletException;
+import java.sql.*;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
+import com.pharmacy.dao.DBConnection;
 
 @WebServlet("/updateMedicine")
 public class UpdateMedicineServlet extends HttpServlet {
-
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        int id = Integer.parseInt(request.getParameter("id"));
-        String name = request.getParameter("name");
-        int quantity = Integer.parseInt(request.getParameter("quantity"));
-        double price = Double.parseDouble(request.getParameter("price"));
-
+    protected void doPost(HttpServletRequest req, HttpServletResponse res) throws IOException {
         try {
             Connection conn = DBConnection.connect();
-
-            String sql = "UPDATE medicine SET name=?, quantity=?, price=? WHERE id=?";
-            PreparedStatement ps = conn.prepareStatement(sql);
-
-            ps.setString(1, name);
-            ps.setInt(2, quantity);
-            ps.setDouble(3, price);
-            ps.setInt(4, id);
-
+            PreparedStatement ps = conn.prepareStatement(
+                "UPDATE medicine SET name=?, quantity=?, price=? WHERE id=?"
+            );
+            ps.setString(1, req.getParameter("name"));
+            ps.setInt(2, Integer.parseInt(req.getParameter("quantity")));
+            ps.setDouble(3, Double.parseDouble(req.getParameter("price")));
+            ps.setInt(4, Integer.parseInt(req.getParameter("id")));
             ps.executeUpdate();
-
-            // 🔥 go back to dashboard after update
-            response.sendRedirect("viewMedicines");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            conn.close();
+        } catch (Exception e) { e.printStackTrace(); }
+        // ← Toast param added here
+        res.sendRedirect(req.getContextPath() + "/viewMedicines?toast=updated");
     }
 }

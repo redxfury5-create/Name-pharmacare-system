@@ -1,6 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%
-    // If already logged in, go straight to dashboard
     HttpSession s = request.getSession(false);
     if (s != null && s.getAttribute("user") != null) {
         response.sendRedirect(request.getContextPath() + "/viewMedicines");
@@ -14,299 +13,441 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PharmaCare — Login</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
+    <title>RxCare — Pharmacy Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
         :root {
-            --green-deep: #071410;
-            --gold:       #C9A84C;
-            --gold-light: #F0D080;
-            --text:       #F5ECD7;
-            --muted:      #B8A070;
-            --danger:     #D96A3A;
-            --success:    #5DAF78;
-            --border:     rgba(201,168,76,0.32);
+            --bg:          #060A0D;
+            --surface:     #0C1218;
+            --surface2:    #111C26;
+            --green:       #00E5A0;
+            --green-dim:   #00B87A;
+            --green-glow:  rgba(0,229,160,0.15);
+            --green-glow2: rgba(0,229,160,0.06);
+            --text:        #C8E6D8;
+            --text-dim:    #7AA090;
+            --muted:       #2E4A3A;
+            --danger:      #FF4757;
+            --border:      rgba(0,229,160,0.12);
+            --border2:     rgba(0,229,160,0.06);
         }
+
         html, body { height: 100%; }
+
         body {
-            min-height: 100vh;
-            font-family: 'Cormorant Garamond', serif;
-            background: var(--green-deep);
-            background-image: url('assets/images/bg-mandala.jpg');
-            background-size: cover; background-position: center;
-            display: flex; align-items: center; justify-content: center;
-            overflow: hidden; position: relative;
-        }
-        body::before {
-            content: ''; position: fixed; inset: 0;
-            background: rgba(3,12,6,0.65); z-index: 0;
-        }
-
-        /* ── Floating particles ── */
-        .particles { position: fixed; inset: 0; pointer-events: none; z-index: 1; }
-        .p {
-            position: absolute; border-radius: 50%;
-            background: var(--gold-light); opacity: 0;
-            animation: rise linear infinite;
-        }
-        @keyframes rise {
-            0%   { transform: translateY(100vh) scale(0); opacity: 0; }
-            8%   { opacity: 0.55; }
-            92%  { opacity: 0.18; }
-            100% { transform: translateY(-8vh) scale(1.2); opacity: 0; }
-        }
-
-        /* ── Wrapper ── */
-        .wrapper {
-            position: relative; z-index: 2;
-            width: 100%; max-width: 450px; padding: 20px;
-        }
-
-        /* entrance animation */
-        .wrapper { animation: cardRise 1s cubic-bezier(.16,1,.3,1) both; }
-        @keyframes cardRise {
-            from { opacity: 0; transform: translateY(48px) scale(0.96); }
-            to   { opacity: 1; transform: translateY(0)    scale(1); }
-        }
-
-        /* ── Ornament SVG ── */
-        .orn { text-align: center; line-height: 0; }
-        .orn svg { width: 300px; }
-
-        /* ── Card ── */
-        .card {
-            background: linear-gradient(168deg, rgba(10,28,14,0.97) 0%, rgba(5,16,8,0.99) 100%);
-            border: 1px solid var(--border);
-            padding: 46px 48px 40px;
-            position: relative;
-            box-shadow:
-                0 0 0 5px rgba(201,168,76,0.05),
-                0 40px 100px rgba(0,0,0,0.78),
-                inset 0 0 80px rgba(201,168,76,0.025);
-        }
-        .card::before {
-            content: ''; position: absolute; inset: 7px;
-            border: 1px solid rgba(201,168,76,0.1); pointer-events: none;
-        }
-        /* animated gold glow pulse on card */
-        .card::after {
-            content: ''; position: absolute; inset: -1px;
-            border: 1px solid rgba(201,168,76,0.0);
-            animation: borderPulse 3s ease-in-out infinite;
-            pointer-events: none;
-        }
-        @keyframes borderPulse {
-            0%,100% { border-color: rgba(201,168,76,0.0); box-shadow: 0 0 0px rgba(201,168,76,0); }
-            50%     { border-color: rgba(201,168,76,0.4); box-shadow: 0 0 22px rgba(201,168,76,0.12); }
-        }
-
-        .cd { position: absolute; color: var(--gold); font-size: 12px; opacity: 0.6; line-height:1; }
-        .cd.tl { top:11px; left:15px; } .cd.tr { top:11px; right:15px; }
-        .cd.bl { bottom:11px; left:15px; } .cd.br { bottom:11px; right:15px; }
-
-        /* ── Logo ── */
-        .logo { text-align: center; margin-bottom: 32px; }
-        .logo-ring {
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 76px; height: 76px;
-            border: 1.5px solid rgba(201,168,76,0.45);
-            border-radius: 50%; margin-bottom: 16px;
-            position: relative;
-            box-shadow: 0 0 0 8px rgba(201,168,76,0.05), 0 0 40px rgba(201,168,76,0.12);
-            animation: ringRotate 20s linear infinite;
-        }
-        @keyframes ringRotate {
-            from { box-shadow: 0 0 0 8px rgba(201,168,76,0.05), 0 0 40px rgba(201,168,76,0.12),  4px 0 0 rgba(201,168,76,0.3); }
-            25%  { box-shadow: 0 0 0 8px rgba(201,168,76,0.05), 0 0 40px rgba(201,168,76,0.12),  0  4px 0 rgba(201,168,76,0.3); }
-            50%  { box-shadow: 0 0 0 8px rgba(201,168,76,0.05), 0 0 40px rgba(201,168,76,0.12), -4px 0 0 rgba(201,168,76,0.3); }
-            75%  { box-shadow: 0 0 0 8px rgba(201,168,76,0.05), 0 0 40px rgba(201,168,76,0.12),  0 -4px 0 rgba(201,168,76,0.3); }
-            100% { box-shadow: 0 0 0 8px rgba(201,168,76,0.05), 0 0 40px rgba(201,168,76,0.12),  4px 0 0 rgba(201,168,76,0.3); }
-        }
-        .logo-ring::before {
-            content: ''; position: absolute; inset: 6px;
-            border: 1px solid rgba(201,168,76,0.2); border-radius: 50%;
-        }
-        .logo-ring span { font-size: 30px; filter: drop-shadow(0 0 10px rgba(201,168,76,0.5)); }
-
-        .logo-name {
-            font-family: 'Cinzel', serif; font-size: 1.8rem; font-weight: 600;
-            color: var(--gold-light); letter-spacing: 5px;
-            text-shadow: 0 0 40px rgba(201,168,76,0.35);
-        }
-        .divider {
-            display: flex; align-items: center; gap: 12px; margin: 10px 0 6px;
-        }
-        .dl { flex:1; height:1px; background: linear-gradient(90deg, transparent, rgba(201,168,76,0.45), transparent); }
-        .dt { font-family:'Cinzel',serif; font-size:0.58rem; color:var(--gold); letter-spacing:3px; }
-        .logo-sub { font-family:'Cinzel',serif; font-size:0.58rem; color:var(--muted); letter-spacing:4px; }
-
-        /* ── Alert banners ── */
-        .alert {
-            padding: 11px 16px; margin-bottom: 22px;
-            font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 1.5px;
-            display: flex; align-items: center; gap: 10px;
-            animation: slideDown 0.4s ease both;
-        }
-        @keyframes slideDown {
-            from { opacity:0; transform: translateY(-10px); }
-            to   { opacity:1; transform: translateY(0); }
-        }
-        .alert-error {
-            background: rgba(217,106,58,0.1);
-            border: 1px solid rgba(217,106,58,0.35);
-            color: var(--danger);
-        }
-        .alert-success {
-            background: rgba(93,175,120,0.1);
-            border: 1px solid rgba(93,175,120,0.35);
-            color: var(--success);
-        }
-
-        /* ── Form ── */
-        .field { margin-bottom: 22px; }
-        label {
-            display: block; font-family: 'Cinzel', serif;
-            font-size: 0.6rem; color: var(--gold);
-            letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 9px;
-        }
-        .inp-wrap { position: relative; }
-        input[type="text"], input[type="password"] {
-            width: 100%; padding: 13px 18px 13px 46px;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(201,168,76,0.22);
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--bg);
             color: var(--text);
-            font-family: 'Cormorant Garamond', serif; font-size: 1.05rem;
-            outline: none;
-            transition: border-color 0.3s, background 0.3s, box-shadow 0.3s;
+            display: flex;
+            min-height: 100vh;
+            overflow: hidden;
         }
+
+        /* ── Dot grid bg ── */
+        body::before {
+            content: '';
+            position: fixed; inset: 0;
+            background-image: radial-gradient(circle, rgba(0,229,160,0.07) 1px, transparent 1px);
+            background-size: 28px 28px;
+            pointer-events: none; z-index: 0;
+        }
+
+        /* ══════════════════════════════
+           LEFT PANEL — Branding
+        ══════════════════════════════ */
+        .left-panel {
+            width: 45%;
+            background: linear-gradient(150deg, #080E14 0%, #0A1A12 50%, #060D0A 100%);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 50px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        /* Glowing background orb */
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(0,229,160,0.07) 0%, transparent 65%);
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            animation: orbPulse 5s ease-in-out infinite;
+        }
+        @keyframes orbPulse {
+            0%,100% { transform: translate(-50%,-50%) scale(1);   opacity: 0.7; }
+            50%     { transform: translate(-50%,-50%) scale(1.15); opacity: 1; }
+        }
+
+        /* Horizontal scan line */
+        .scanline {
+            position: absolute;
+            left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--green), transparent);
+            opacity: 0.3;
+            animation: scan 6s linear infinite;
+        }
+        @keyframes scan {
+            0%   { top: 0%; }
+            100% { top: 100%; }
+        }
+
+        /* Corner markers */
+        .corner {
+            position: absolute;
+            width: 24px; height: 24px;
+            border-color: var(--green);
+            border-style: solid;
+            opacity: 0.4;
+        }
+        .corner.tl { top: 24px; left: 24px; border-width: 2px 0 0 2px; }
+        .corner.tr { top: 24px; right: 24px; border-width: 2px 2px 0 0; }
+        .corner.bl { bottom: 24px; left: 24px; border-width: 0 0 2px 2px; }
+        .corner.br { bottom: 24px; right: 24px; border-width: 0 2px 2px 0; }
+
+        .brand { position: relative; z-index: 1; text-align: center; }
+
+        /* Medical cross SVG */
+        .med-cross {
+            width: 80px; height: 80px;
+            margin: 0 auto 28px;
+            position: relative;
+            filter: drop-shadow(0 0 20px rgba(0,229,160,0.5));
+            animation: crossPulse 3s ease-in-out infinite;
+        }
+        @keyframes crossPulse {
+            0%,100% { filter: drop-shadow(0 0 20px rgba(0,229,160,0.5)); }
+            50%     { filter: drop-shadow(0 0 35px rgba(0,229,160,0.85)); }
+        }
+
+        .brand-name {
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: 6px;
+            color: #fff;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+        .brand-name span { color: var(--green); }
+
+        .brand-tagline {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 48px;
+        }
+
+        /* Info pills */
+        .info-pills { display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 260px; }
+        .pill {
+            display: flex; align-items: center; gap: 14px;
+            background: rgba(0,229,160,0.05);
+            border: 1px solid var(--border);
+            padding: 12px 16px;
+            animation: pillIn 0.6s ease both;
+        }
+        .pill:nth-child(1){animation-delay:0.8s}
+        .pill:nth-child(2){animation-delay:1.0s}
+        .pill:nth-child(3){animation-delay:1.2s}
+        @keyframes pillIn {
+            from { opacity:0; transform:translateX(-16px); }
+            to   { opacity:1; transform:translateX(0); }
+        }
+        .pill-icon { font-size: 18px; }
+        .pill-text { font-size: 0.82rem; color: var(--text-dim); letter-spacing: 0.5px; }
+        .pill-text strong { color: var(--green); display: block; font-size: 0.78rem; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px; }
+
+        /* System status */
+        .sys-status {
+            position: absolute;
+            bottom: 28px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--muted);
+            letter-spacing: 1.5px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .status-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--green);
+            animation: blink 2s ease-in-out infinite;
+        }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+        /* ══════════════════════════════
+           RIGHT PANEL — Login Form
+        ══════════════════════════════ */
+        .right-panel {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-box {
+            width: 100%;
+            max-width: 400px;
+            animation: boxIn 0.7s cubic-bezier(.16,1,.3,1) both;
+        }
+        @keyframes boxIn {
+            from { opacity:0; transform:translateY(32px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+
+        .login-header { margin-bottom: 36px; }
+        .login-title {
+            font-size: 1.6rem; font-weight: 700;
+            color: #fff; letter-spacing: 2px; margin-bottom: 6px;
+        }
+        .login-sub {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem; color: var(--text-dim); letter-spacing: 1px;
+        }
+
+        /* Divider */
+        .h-line {
+            height: 1px; background: var(--border);
+            margin-bottom: 36px; position: relative;
+        }
+        .h-line::after {
+            content: 'AUTHENTICATION REQUIRED';
+            position: absolute;
+            top: -8px; left: 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.58rem; color: var(--green-dim);
+            letter-spacing: 2px;
+            background: var(--bg); padding-right: 10px;
+        }
+
+        /* Alert banners */
+        .alert {
+            padding: 12px 16px; margin-bottom: 24px;
+            font-size: 0.85rem; letter-spacing: 0.5px;
+            display: flex; align-items: center; gap: 10px;
+            border-left: 3px solid;
+            animation: alertSlide 0.4s ease both;
+        }
+        @keyframes alertSlide { from{opacity:0;transform:translateX(-10px)} to{opacity:1;transform:translateX(0)} }
+        .alert-error   { background: rgba(255,71,87,0.08);  border-color: var(--danger); color: #ff8a94; }
+        .alert-success { background: rgba(0,229,160,0.08);  border-color: var(--green);  color: var(--green); }
+
+        /* Form fields */
+        .field { margin-bottom: 20px; }
+
+        .field label {
+            display: flex; align-items: center; gap: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem; color: var(--green-dim);
+            letter-spacing: 2px; text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .field label::before {
+            content: '';
+            width: 4px; height: 4px;
+            background: var(--green); border-radius: 50%;
+        }
+
+        .inp-wrap { position: relative; }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 13px 16px 13px 44px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1rem; font-weight: 500;
+            letter-spacing: 0.5px;
+            outline: none;
+            transition: all 0.25s;
+        }
+        input:focus {
+            border-color: var(--green);
+            background: rgba(0,229,160,0.04);
+            box-shadow: 0 0 0 3px rgba(0,229,160,0.08), 0 0 20px rgba(0,229,160,0.06);
+        }
+        input::placeholder { color: var(--muted); font-style: normal; }
+
         .inp-icon {
-            position: absolute; left: 16px; top: 50%;
+            position: absolute; left: 14px; top: 50%;
             transform: translateY(-50%);
-            font-size: 16px; opacity: 0.5;
-            transition: opacity 0.3s;
+            font-size: 16px; opacity: 0.45;
+            transition: opacity 0.25s;
             pointer-events: none;
         }
-        input:focus { border-color: rgba(201,168,76,0.7); background: rgba(201,168,76,0.045); box-shadow: 0 0 0 4px rgba(201,168,76,0.08); }
-        input:focus + .inp-icon { opacity: 1; }  /* won't work with this order — swap below */
         .inp-wrap:focus-within .inp-icon { opacity: 0.9; }
-        input::placeholder { color: rgba(245,236,215,0.2); font-style: italic; }
 
-        /* ── Button ── */
-        .btn {
-            width: 100%; padding: 15px; margin-top: 8px;
-            background: linear-gradient(135deg, #7A5C10 0%, #C9A84C 35%, #F0D080 55%, #C9A84C 75%, #7A5C10 100%);
-            border: none; color: #1C0F00;
-            font-family: 'Cinzel', serif; font-size: 0.72rem; font-weight: 600;
-            letter-spacing: 4px; text-transform: uppercase;
-            cursor: pointer; position: relative; overflow: hidden;
-            box-shadow: 0 4px 28px rgba(201,168,76,0.38), inset 0 1px 0 rgba(255,255,255,0.25);
-            transition: transform 0.25s, box-shadow 0.25s;
+        /* Submit button */
+        .btn-login {
+            width: 100%; padding: 14px;
+            margin-top: 8px;
+            background: var(--green);
+            border: none;
+            color: #040A06;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1rem; font-weight: 700;
+            letter-spacing: 3px; text-transform: uppercase;
+            cursor: pointer;
+            position: relative; overflow: hidden;
+            transition: all 0.25s;
+            box-shadow: 0 4px 24px rgba(0,229,160,0.3);
         }
-        .btn::before {
-            content: ''; position: absolute; top:0; left:-120%; width:80%; height:100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
-            transform: skewX(-20deg);
-            animation: shimmer 3s ease-in-out infinite;
+        .btn-login::before {
+            content: '';
+            position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+            transition: left 0.5s;
         }
-        @keyframes shimmer {
-            0%   { left: -120%; }
-            60%  { left: 140%; }
-            100% { left: 140%; }
+        .btn-login:hover::before { left: 100%; }
+        .btn-login:hover {
+            background: #00F0AA;
+            box-shadow: 0 6px 36px rgba(0,229,160,0.5);
+            transform: translateY(-1px);
         }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 38px rgba(201,168,76,0.58); }
-        .btn:active { transform: translateY(0); }
+        .btn-login:active { transform: translateY(0); }
 
-        .hint {
-            text-align: center; margin-top: 20px;
-            font-size: 0.85rem; color: rgba(184,160,112,0.5); font-style: italic;
+        .login-hint {
+            margin-top: 20px; text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem; color: var(--muted);
+            letter-spacing: 1px;
         }
-        .hint code {
-            color: var(--gold); font-style: normal;
-            background: rgba(201,168,76,0.08); padding: 1px 7px;
+        .login-hint code {
+            color: var(--text-dim);
+            background: var(--surface);
+            padding: 2px 8px; border: 1px solid var(--border);
         }
+
+        /* Live clock */
+        .live-clock {
+            position: absolute; top: 28px; right: 28px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem; color: var(--text-dim);
+            letter-spacing: 2px; text-align: right;
+        }
+        .clock-time { font-size: 1.2rem; color: var(--green); display: block; }
     </style>
 </head>
 <body>
 
-<div class="particles" id="pts"></div>
+<div class="left-panel">
+    <div class="scanline"></div>
+    <div class="corner tl"></div><div class="corner tr"></div>
+    <div class="corner bl"></div><div class="corner br"></div>
 
-<div class="wrapper">
-    <!-- Top ornament -->
-    <div class="orn">
-        <svg viewBox="0 0 300 38" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <line x1="0" y1="20" x2="300" y2="20" stroke="rgba(201,168,76,0.2)" stroke-width="0.5"/>
-            <path d="M70 20 Q105 3 150 20 Q195 37 230 20" stroke="#C9A84C" stroke-width="1.2" fill="none" opacity="0.85"/>
-            <path d="M50 20 Q100 1 150 20 Q200 39 250 20" stroke="#C9A84C" stroke-width="0.5" fill="none" opacity="0.3"/>
-            <circle cx="150" cy="4"  r="3.2" fill="#C9A84C" opacity="0.9"/>
-            <circle cx="133" cy="10" r="1.8" fill="#C9A84C" opacity="0.55"/>
-            <circle cx="167" cy="10" r="1.8" fill="#C9A84C" opacity="0.55"/>
-            <polygon points="150,0 154,6 150,3.5 146,6" fill="#C9A84C" opacity="0.8"/>
-        </svg>
+    <div class="brand">
+        <div class="med-cross">
+            <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="28" y="4"  width="24" height="72" rx="3" fill="#00E5A0"/>
+                <rect x="4"  y="28" width="72" height="24" rx="3" fill="#00E5A0"/>
+                <rect x="28" y="4"  width="24" height="72" rx="3" fill="url(#cg)" opacity="0.4"/>
+                <defs>
+                    <linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#fff" stop-opacity="0.4"/>
+                        <stop offset="100%" stop-color="#fff" stop-opacity="0"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+        </div>
+        <div class="brand-name">Rx<span>Care</span></div>
+        <div class="brand-tagline">Pharmacy Management System</div>
+
+        <div class="info-pills">
+            <div class="pill">
+                <span class="pill-icon">💊</span>
+                <div class="pill-text">
+                    <strong>Inventory Control</strong>
+                    Real-time stock tracking
+                </div>
+            </div>
+            <div class="pill">
+                <span class="pill-icon">📊</span>
+                <div class="pill-text">
+                    <strong>Smart Alerts</strong>
+                    Low stock notifications
+                </div>
+            </div>
+            <div class="pill">
+                <span class="pill-icon">📷</span>
+                <div class="pill-text">
+                    <strong>Barcode Scanning</strong>
+                    Fast medicine entry
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="card">
-        <span class="cd tl">◆</span><span class="cd tr">◆</span>
-        <span class="cd bl">◆</span><span class="cd br">◆</span>
+    <div class="sys-status">
+        <div class="status-dot"></div>
+        SYSTEM ONLINE
+    </div>
+</div>
 
-        <div class="logo">
-            <div class="logo-ring"><span>⚕</span></div>
-            <div class="logo-name">PHARMACARE</div>
-            <div class="divider"><div class="dl"></div><div class="dt">✦ SYSTEM ✦</div><div class="dl"></div></div>
-            <div class="logo-sub">Inventory Management</div>
+<div class="right-panel">
+    <div class="live-clock">
+        <span class="clock-time" id="clk">--:--:--</span>
+        <span id="clkDate"></span>
+    </div>
+
+    <div class="login-box">
+        <div class="login-header">
+            <div class="login-title">Staff Login</div>
+            <div class="login-sub">// Authorised personnel only</div>
         </div>
 
-        <!-- Error / Logout messages -->
+        <div class="h-line"></div>
+
         <% if ("1".equals(error)) { %>
-        <div class="alert alert-error">⚠ &nbsp; Invalid username or password. Please try again.</div>
+        <div class="alert alert-error">⚠ &nbsp; Invalid credentials. Access denied.</div>
         <% } %>
         <% if ("1".equals(logout)) { %>
-        <div class="alert alert-success">✦ &nbsp; You have been signed out successfully.</div>
+        <div class="alert alert-success">✔ &nbsp; Signed out successfully. Session ended.</div>
         <% } %>
 
         <form action="<%=request.getContextPath()%>/login" method="post">
             <div class="field">
                 <label for="username">Username</label>
                 <div class="inp-wrap">
-                    <input type="text" id="username" name="username" placeholder="Enter your username" required autofocus>
                     <span class="inp-icon">👤</span>
+                    <input type="text" id="username" name="username" placeholder="Enter username" required autofocus>
                 </div>
             </div>
             <div class="field">
                 <label for="password">Password</label>
                 <div class="inp-wrap">
-                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
                     <span class="inp-icon">🔒</span>
+                    <input type="password" id="password" name="password" placeholder="Enter password" required>
                 </div>
             </div>
-            <button type="submit" class="btn">✦ &nbsp; Enter &nbsp; ✦</button>
+            <button type="submit" class="btn-login">→ &nbsp; Access System</button>
         </form>
 
-        <div class="hint">Default: <code>admin</code> / <code>admin</code></div>
-    </div>
-
-    <!-- Bottom ornament -->
-    <div class="orn">
-        <svg viewBox="0 0 300 38" fill="none" xmlns="http://www.w3.org/2000/svg" style="transform:scaleY(-1)">
-            <line x1="0" y1="20" x2="300" y2="20" stroke="rgba(201,168,76,0.2)" stroke-width="0.5"/>
-            <path d="M70 20 Q105 3 150 20 Q195 37 230 20" stroke="#C9A84C" stroke-width="1.2" fill="none" opacity="0.85"/>
-            <circle cx="150" cy="4" r="3.2" fill="#C9A84C" opacity="0.9"/>
-            <circle cx="133" cy="10" r="1.8" fill="#C9A84C" opacity="0.55"/>
-            <circle cx="167" cy="10" r="1.8" fill="#C9A84C" opacity="0.55"/>
-            <polygon points="150,0 154,6 150,3.5 146,6" fill="#C9A84C" opacity="0.8"/>
-        </svg>
+        <div class="login-hint">
+            Default credentials: <code>admin</code> / <code>admin</code>
+        </div>
     </div>
 </div>
 
 <script>
-// Floating gold particles
-const c = document.getElementById('pts');
-for(let i = 0; i < 35; i++){
-    const p = document.createElement('div'); p.className = 'p';
-    const sz = (Math.random() * 2.5 + 0.8) + 'px';
-    p.style.cssText = `left:${Math.random()*100}vw;width:${sz};height:${sz};animation-duration:${Math.random()*14+9}s;animation-delay:${Math.random()*14}s`;
-    c.appendChild(p);
+function updateClock() {
+    const now = new Date();
+    document.getElementById('clk').textContent = now.toLocaleTimeString('en-GB');
+    document.getElementById('clkDate').textContent = now.toLocaleDateString('en-GB', {weekday:'short', day:'2-digit', month:'short', year:'numeric'});
 }
+updateClock(); setInterval(updateClock, 1000);
 </script>
 </body>
 </html>
